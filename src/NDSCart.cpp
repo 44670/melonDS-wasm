@@ -52,7 +52,7 @@ u32 TransferDir;
 u8 TransferCmd[8];
 
 bool CartInserted;
-u8* CartROM;
+u8 CartROM[128*1024*1024];
 u32 CartROMSize;
 u32 CartID;
 bool CartIsHomebrew;
@@ -371,7 +371,7 @@ void CartCommon::ReadROM(u32 addr, u32 len, u8* data, u32 offset)
 
 CartRetail::CartRetail(u8* rom, u32 len, u32 chipid) : CartCommon(rom, len, chipid)
 {
-    SRAM = nullptr;
+SRAM = nullptr;
 }
 
 CartRetail::~CartRetail()
@@ -428,7 +428,7 @@ void CartRetail::DoSavestate(Savestate* file)
     if (!file->Saving)
     {
         SRAMFileDirty = false;
-        NDSCart_SRAMManager::RequestFlush();
+        //NDSCart_SRAMManager::RequestFlush();
     }
 }
 
@@ -466,7 +466,7 @@ void CartRetail::LoadSave(const char* path, u32 type)
     }
 
     SRAMFileDirty = false;
-    NDSCart_SRAMManager::Setup(path, SRAM, SRAMLength);
+    //NDSCart_SRAMManager::Setup(path, SRAM, SRAMLength);
 
     switch (type)
     {
@@ -524,7 +524,7 @@ void CartRetail::FlushSRAMFile()
     if (!SRAMFileDirty) return;
 
     SRAMFileDirty = false;
-    NDSCart_SRAMManager::RequestFlush();
+    //NDSCart_SRAMManager::RequestFlush();
 }
 
 int CartRetail::ROMCommandStart(u8* cmd, u8* data, u32 len)
@@ -1390,7 +1390,7 @@ void CartHomebrew::ReadROM_B7(u32 addr, u32 len, u8* data, u32 offset)
 
 bool Init()
 {
-    CartROM = nullptr;
+    //CartROM = nullptr;
     Cart = nullptr;
 
     return true;
@@ -1398,15 +1398,15 @@ bool Init()
 
 void DeInit()
 {
-    if (CartROM) delete[] CartROM;
+    //if (CartROM) delete[] CartROM;
     if (Cart) delete Cart;
 }
 
 void Reset()
 {
     CartInserted = false;
-    if (CartROM) delete[] CartROM;
-    CartROM = nullptr;
+    //if (CartROM) delete[] CartROM;
+    //CartROM = nullptr;
     CartROMSize = 0;
     CartID = 0;
     CartIsHomebrew = false;
@@ -1643,12 +1643,12 @@ bool LoadROMCommon(u32 filelength, const char *sram, bool direct)
     return true;
 }
 
-bool LoadROM(const char* path, const char* sram, bool direct)
+/*
+bool LoadROM(const char* path, u32 len, const char* sram, bool direct)
 {
     // TODO: streaming mode? for really big ROMs or systems with limited RAM
     // for now we're lazy
     // also TODO: validate what we're loading!!
-
     FILE* f = Platform::OpenFile(path, "rb");
     if (!f)
     {
@@ -1673,6 +1673,7 @@ bool LoadROM(const char* path, const char* sram, bool direct)
 
     return LoadROMCommon(len, sram, direct);
 }
+*/
 
 bool LoadROM(const u8* romdata, u32 filelength, const char *sram, bool direct)
 {
@@ -1683,9 +1684,6 @@ bool LoadROM(const u8* romdata, u32 filelength, const char *sram, bool direct)
     while (CartROMSize < len)
         CartROMSize <<= 1;
 
-    CartROM = new u8[CartROMSize];
-    memset(CartROM, 0, CartROMSize);
-    memcpy(CartROM, romdata, filelength);
 
     return LoadROMCommon(filelength, sram, direct);
 }
@@ -1870,7 +1868,8 @@ void AdvanceROMTransfer()
 
 u32 ReadROMData()
 {
-    if (ROMCnt & (1<<30)) return 0;
+    //XXX: This breaks portalDS.
+    //if (ROMCnt & (1<<30)) return 0;
 
     if (ROMCnt & (1<<23))
     {

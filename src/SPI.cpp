@@ -30,7 +30,7 @@ namespace SPI_Firmware
 {
 
 char FirmwarePath[1024];
-u8* Firmware;
+u8 Firmware[256*1024];
 u32 FirmwareLength;
 u32 FirmwareMask;
 
@@ -79,13 +79,13 @@ bool VerifyCRC16(u32 start, u32 offset, u32 len, u32 crcoffset)
 bool Init()
 {
     memset(FirmwarePath, 0, sizeof(FirmwarePath));
-    Firmware = NULL;
+    //Firmware = NULL;
     return true;
 }
 
 void DeInit()
 {
-    if (Firmware) delete[] Firmware;
+    //if (Firmware) delete[] Firmware;
 }
 
 u32 FixFirmwareLength(u32 originalLength)
@@ -113,7 +113,12 @@ u32 FixFirmwareLength(u32 originalLength)
 
 void Reset()
 {
-    if (Firmware) delete[] Firmware;
+#ifdef WASM
+    FirmwareLength = sizeof(Firmware);
+    FirmwareMask = FirmwareLength - 1;
+#else
+
+    //if (Firmware) delete[] Firmware;
     Firmware = NULL;
 
     if (NDS::ConsoleType == 1)
@@ -198,6 +203,7 @@ void Reset()
             *(u16*)&Firmware[0x2A] = CRC16(&Firmware[0x2C], *(u16*)&Firmware[0x2C], 0x0000);
         }
     }
+#endif
 
     printf("MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
            Firmware[0x36], Firmware[0x37], Firmware[0x38],

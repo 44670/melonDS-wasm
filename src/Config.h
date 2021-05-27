@@ -18,7 +18,17 @@
 
 #ifndef CONFIG_H
 #define CONFIG_H
+#define WASM 1
 
+
+  #ifndef PRIu64
+    #ifdef _MSC_EXTENSIONS
+      #define PRIu64	"I64u"
+    #else
+      #define PRIu64	"llu"
+    #endif
+  #endif
+  
 #include <stdio.h>
 
 #include "types.h"

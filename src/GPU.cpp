@@ -79,7 +79,9 @@ u8* VRAMPtr_BBG[0x8];
 u8* VRAMPtr_BOBJ[0x8];
 
 int FrontBuffer;
-u32* Framebuffer[2][2];
+#define FB_SIZE (256 * 192)
+u32 fb[FB_SIZE*4];
+u32* const Framebuffer[2][2] = {fb, fb + FB_SIZE, fb + FB_SIZE*2, fb + FB_SIZE*3};
 int Renderer = 0;
 
 GPU2D::Unit GPU2D_A(0);
@@ -149,8 +151,8 @@ bool Init()
     if (!GPU3D::Init()) return false;
 
     FrontBuffer = 0;
-    Framebuffer[0][0] = NULL; Framebuffer[0][1] = NULL;
-    Framebuffer[1][0] = NULL; Framebuffer[1][1] = NULL;
+    //Framebuffer[0][0] = NULL; Framebuffer[0][1] = NULL;
+    //Framebuffer[1][0] = NULL; Framebuffer[1][1] = NULL;
     Renderer = 0;
 
     return true;
@@ -161,10 +163,10 @@ void DeInit()
     GPU2D_Renderer.reset();
     GPU3D::DeInit();
 
-    if (Framebuffer[0][0]) delete[] Framebuffer[0][0];
-    if (Framebuffer[0][1]) delete[] Framebuffer[0][1];
-    if (Framebuffer[1][0]) delete[] Framebuffer[1][0];
-    if (Framebuffer[1][1]) delete[] Framebuffer[1][1];
+    //if (Framebuffer[0][0]) delete[] Framebuffer[0][0];
+    //if (Framebuffer[0][1]) delete[] Framebuffer[0][1];
+    //if (Framebuffer[1][0]) delete[] Framebuffer[1][0];
+    //if (Framebuffer[1][1]) delete[] Framebuffer[1][1];
 }
 
 void ResetVRAMCache()
@@ -208,6 +210,7 @@ void Reset()
 
     memset(Palette, 0, 2*1024);
     memset(OAM, 0, 2*1024);
+    
 
     memset(VRAM_A, 0, 128*1024);
     memset(VRAM_B, 0, 128*1024);
@@ -267,12 +270,11 @@ void Reset()
     GPU3D::Reset();
 
     int backbuf = FrontBuffer ? 0 : 1;
-    GPU2D_Renderer->SetFramebuffer(Framebuffer[backbuf][1], Framebuffer[backbuf][0]);
+    GPU2D_Renderer->SetFramebuffer(Framebuffer[backbuf][1], Framebuffer[backbuf][0]);TRACE_1;
 
     ResetRenderer();
 
     ResetVRAMCache();
-
     OAMDirty = 0x3;
     PaletteDirty = 0xF;
 }
@@ -439,6 +441,7 @@ void ResetRenderer()
 
 void SetRenderSettings(int renderer, RenderSettings& settings)
 {
+    printf("SetRenderSettings\n");
     if (renderer != Renderer)
     {
         DeInitRenderer();
@@ -451,6 +454,7 @@ void SetRenderSettings(int renderer, RenderSettings& settings)
     else
         fbsize = 256 * 192;
 
+/*
     if (Framebuffer[0][0]) { delete[] Framebuffer[0][0]; Framebuffer[0][0] = nullptr; }
     if (Framebuffer[1][0]) { delete[] Framebuffer[1][0]; Framebuffer[1][0] = nullptr; }
     if (Framebuffer[0][1]) { delete[] Framebuffer[0][1]; Framebuffer[0][1] = nullptr; }
@@ -461,10 +465,12 @@ void SetRenderSettings(int renderer, RenderSettings& settings)
     Framebuffer[0][1] = new u32[fbsize];
     Framebuffer[1][1] = new u32[fbsize];
 
+*/
     memset(Framebuffer[0][0], 0, fbsize*4);
     memset(Framebuffer[1][0], 0, fbsize*4);
     memset(Framebuffer[0][1], 0, fbsize*4);
     memset(Framebuffer[1][1], 0, fbsize*4);
+    printf("memset done\n");
 
     AssignFramebuffers();
 

@@ -186,7 +186,7 @@ extern u32 ROMCnt;
 
 extern u8 ROMCommand[8];
 
-extern u8* CartROM;
+extern u8 CartROM[128*1024*1024];
 extern u32 CartROMSize;
 
 extern u32 CartID;

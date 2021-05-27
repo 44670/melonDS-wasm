@@ -193,7 +193,7 @@ bool Init()
     DMAs[6] = new DMA(1, 2);
     DMAs[7] = new DMA(1, 3);
 
-    if (!NDSCart_SRAMManager::Init()) return false;
+    //if (!NDSCart_SRAMManager::Init()) return false;
     if (!NDSCart::Init()) return false;
     if (!GBACart::Init()) return false;
     if (!GPU::Init()) return false;
@@ -221,7 +221,7 @@ void DeInit()
     for (int i = 0; i < 8; i++)
         delete DMAs[i];
 
-    NDSCart_SRAMManager::DeInit();
+    //NDSCart_SRAMManager::DeInit();
     NDSCart::DeInit();
     GBACart::DeInit();
     GPU::DeInit();
@@ -445,6 +445,7 @@ void SetupDirectBoot()
     SPI_Firmware::SetupDirectBoot();
 }
 
+
 void Reset()
 {
     FILE* f;
@@ -453,6 +454,7 @@ void Reset()
     RunningGame = false;
     LastSysClockCycles = 0;
 
+/*
     memset(ARM9BIOS, 0, 0x1000);
     memset(ARM7BIOS, 0, 0x4000);
 
@@ -492,6 +494,7 @@ void Reset()
         printf("ARM7 BIOS loaded\n");
         fclose(f);
     }
+*/
 
 #ifdef JIT_ENABLED
     ARMJIT::Reset();
@@ -532,6 +535,7 @@ void Reset()
     memset(ROMSeed0, 0, 2*8);
     memset(ROMSeed1, 0, 2*8);
     SetGBASlotTimings();
+
 
     IME[0] = 0;
     IE[0] = 0;
@@ -582,6 +586,7 @@ void Reset()
     KeyInput = 0x007F03FF;
     KeyCnt = 0;
     RCnt = 0;
+
 
     NDSCart::Reset();
     GBACart::Reset();
@@ -843,7 +848,7 @@ bool LoadROM(const u8* romdata, u32 filelength, const char *sram, bool direct)
         return false;
     }
 }
-
+/*
 bool LoadROM(const char* path, const char* sram, bool direct)
 {
     if (NDSCart::LoadROM(path, sram, direct))
@@ -857,6 +862,7 @@ bool LoadROM(const char* path, const char* sram, bool direct)
         return false;
     }
 }
+*/
 
 bool LoadGBAROM(const char* path, const char* sram)
 {

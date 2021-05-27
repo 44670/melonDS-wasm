@@ -23,7 +23,7 @@
 
 namespace SPI_Firmware
 {
-
+extern u8 Firmware[256*1024];
 void SetupDirectBoot();
 
 u32 FixFirmwareLength(u32 originalLength);

@@ -19,6 +19,8 @@
 #ifndef NDS_H
 #define NDS_H
 
+#define TRACE_1 printf("%s %d\n", __FILE__, __LINE__);
+
 #include "Savestate.h"
 #include "types.h"
 
